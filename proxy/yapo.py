@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 from itertools import cycle
-import time
+from datetime import date, timedelta
 
 urlProxy = 'https://free-proxy-list.net/'
 
@@ -81,12 +81,14 @@ while stop == False:
                 print("Finalizando scraping")
                 stop = True
                 break
-            print(f"Fecha: {fecha}")
-            print(f"Url: {urlPub['href']}")
-            print(f"Precio: {datos.findAll('td')[2].find('span', class_='price').text.strip()}")
-            print(f"Dormitorios: {datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()}")
-            print(f"Baños: {datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()}")
-            print(f"Comuna: {datos.findAll('td')[3].find('span', class_='commune').text.strip()}")
+            if(fecha == "Ayer"):
+                fecha = date.today() - timedelta(days=1)
+                print(f"Fecha: {fecha}")
+                print(f"Url: {urlPub['href']}")
+                print(f"Precio: {datos.findAll('td')[2].find('span', class_='price').text.strip()}")
+                print(f"Dormitorios: {datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()}")
+                print(f"Baños: {datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()}")
+                print(f"Comuna: {datos.findAll('td')[3].find('span', class_='commune').text.strip()}")
         except:
             print("no data")    
     pagina += 1            

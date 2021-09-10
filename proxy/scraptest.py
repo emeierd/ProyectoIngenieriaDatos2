@@ -58,3 +58,5 @@ while exito== False:
     i+=1
     if i > 20:
         exito = True    
+
+# Falta poner algo que reinicie funcion de proxy si se queda pegado        
