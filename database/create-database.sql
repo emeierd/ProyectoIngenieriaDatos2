@@ -6,7 +6,7 @@ CREATE TABLE d_comuna (comuna_id int IDENTITY(1,1) PRIMARY KEY, nombre varchar(5
 GO
 CREATE TABLE d_fecha (fecha date PRIMARY KEY, mes_id int NOT NULL, año int NOT NULL);
 GO
-CREATE TABLE d_mes (mes_id int IDENTITY(1,1) PRIMARY KEY, nombre varchar(50), año int NOT NULL, cuatrimestre int NOT NULL);
+CREATE TABLE d_mes (mes_id int IDENTITY(1,1) PRIMARY KEY, numero int NOT NULL, nombre varchar(50), año int NOT NULL, cuatrimestre int NOT NULL);
 GO
 CREATE TABLE d_gastos (gasto_id int IDENTITY(1,1) PRIMARY KEY, nombre varchar(50), valor int NOT NULL);
 GO
