@@ -1,3 +1,4 @@
+import pyodbc
 from bs4 import BeautifulSoup
 import requests
 from itertools import cycle
@@ -13,9 +14,6 @@ headers = {
         'Accept-Language': 'en-US,en;q=0.9',
         'Pragma': 'no-cache',
     }
-
-# def rowgetDataText(tr, coltag='td'): # td (data) or th (header)       
-#     return [td.get_text(strip=True) for td in tr.find_all(coltag)] 
 
 def extract_proxies():
     proxies = set()
@@ -34,11 +32,10 @@ def extract_proxies():
             print("Head")  
     return proxies
 
-## tenia error en que la lista estaba fuera de indice, porque se agrega la columna de head
+
 proxies = extract_proxies()  
 proxy_pool = cycle(proxies)
-#url = 'https://www.yapo.cl/region_metropolitana/arrendar?ca=15_s&l=0&w=1&cmn=&ret=1'
-urlBase = 'https://www.yapo.cl/region_metropolitana/arrendar?ca=15_s&ret=1&cg=1240&o='
+urlBase = 'https://es.wikipedia.org/wiki/Anexo:Comunas_de_Santiago_de_Chile'
 
 def scrap(url):
     exito = False
@@ -50,10 +47,11 @@ def scrap(url):
         try:
             html_text = requests.get(url, headers = headers, proxies={"http": proxy, "https": proxy}).text
             soup = BeautifulSoup(html_text, 'html.parser')
-            table_tr2 = soup.find('table',class_='listing_thumbs').findAll("tr")
-        except:
+            table_tr2 = soup.findAll('table')[5].tbody
+        except Exception as e:
             #Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work. 
             #We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url 
+            print(e)
             print("Skipping. Connnection error")   
         else:
             exito = True    
@@ -64,33 +62,27 @@ def scrap(url):
             exito = True  
     return table_tr2
 
-stop = False
-pagina = 1
 
-while stop == False:
-    url = f"{urlBase}{pagina}"
-    data = scrap(url)
+conn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
+                      "Server=localhost,1433;"
+                      "Database=ProyectoIngenieriaDatos2;"
+                      "uid=sa;"
+                      "pwd=myPass123word")
 
-    print(f"Comenzando scraping, página: {pagina}")
-    for datos in data:
-        try:
-            fecha = datos.findAll('td')[0].find('span').text.strip()
-            urlPub = datos.findAll('td')[0].find('a', href= True)
-            #print(datos.findAll("td")[4])
-            if(fecha != "Hoy" and fecha != "Ayer"):
-                print("Finalizando scraping")
-                stop = True
-                break
-            if(fecha == "Ayer"):
-                fecha = date.today() - timedelta(days=1)
-                dormitorios = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()
-                baños = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()
-                print(f"Fecha: {fecha}")
-                print(f"Url: {urlPub['href']}")
-                print(f"Precio: {datos.findAll('td')[2].find('span', class_='price').text.strip()}")
-                print(f"Dormitorios: {dormitorios}")
-                print(f"Baños: {baños}")
-                print(f"Comuna: {datos.findAll('td')[3].find('span', class_='commune').text.strip()}")                                
-        except:
-            print("no data")    
-    pagina += 1       
+data = scrap(urlBase)
+cursor = conn.cursor()
+
+for row in data:
+    try:
+        comuna = row.findAll("td")[0].text.strip()
+        sector = row.findAll("td")[1].text.strip()
+        query = f"INSERT INTO d_comuna values('{comuna}','{sector}',0)"
+        cursor.execute(query)
+        print(f"Comuna: {comuna}")
+        print(f"Sector: {sector}")
+        print("")
+    except Exception as e:    
+        print(e)
+
+
+conn.commit()        
