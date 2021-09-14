@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
 from itertools import cycle
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+import pyodbc
 
 urlProxy = 'https://free-proxy-list.net/'
 
@@ -64,33 +65,52 @@ def scrap(url):
             exito = True  
     return table_tr2
 
-stop = False
-pagina = 1
+conn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
+                      "Server=localhost,1433;"
+                      "Database=ProyectoIngenieriaDatos2;"
+                      "uid=sa;"
+                      "pwd=myPass123word")
 
-while stop == False:
-    url = f"{urlBase}{pagina}"
-    data = scrap(url)
+cursor = conn.cursor()   
+try:
+    stop = False
+    pagina = 1
+    fechaInicio = datetime.now()
 
-    print(f"Comenzando scraping, página: {pagina}")
-    for datos in data:
-        try:
-            fecha = datos.findAll('td')[0].find('span').text.strip()
-            urlPub = datos.findAll('td')[0].find('a', href= True)
-            #print(datos.findAll("td")[4])
-            if(fecha != "Hoy" and fecha != "Ayer"):
-                print("Finalizando scraping")
-                stop = True
-                break
-            if(fecha == "Ayer"):
-                fecha = date.today() - timedelta(days=1)
-                dormitorios = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()
-                baños = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()
-                print(f"Fecha: {fecha}")
-                print(f"Url: {urlPub['href']}")
-                print(f"Precio: {datos.findAll('td')[2].find('span', class_='price').text.strip()}")
-                print(f"Dormitorios: {dormitorios}")
-                print(f"Baños: {baños}")
-                print(f"Comuna: {datos.findAll('td')[3].find('span', class_='commune').text.strip()}")                                
-        except:
-            print("no data")    
-    pagina += 1       
+    while stop == False:
+        url = f"{urlBase}{pagina}"
+        data = scrap(url)
+
+        print(f"Comenzando scraping, página: {pagina}")
+        for datos in data:
+            try:
+                fecha = datos.findAll('td')[0].find('span').text.strip()
+                urlPub = datos.findAll('td')[0].find('a', href= True)
+                #print(datos.findAll("td")[4])
+                if(fecha != "Hoy" and fecha != "Ayer"):
+                    print("Finalizando scraping")
+                    stop = True
+                    break
+                if(fecha == "Ayer"):
+                    fecha = date.today() - timedelta(days=1)
+                    dormitorios = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()
+                    baños = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()
+                    print(f"Fecha: {fecha}")
+                    print(f"Url: {urlPub['href']}")
+                    print(f"Precio: {datos.findAll('td')[2].find('span', class_='price').text.strip()}")
+                    print(f"Dormitorios: {dormitorios}")
+                    print(f"Baños: {baños}")
+                    print(f"Comuna: {datos.findAll('td')[3].find('span', class_='commune').text.strip()}")                                
+            except:
+                print("no data")    
+        pagina += 1     
+    fechaFin = datetime.now()      
+    cursor.execute("insert into logs_arriendo (fuente,fechaInicio,fechaFin,mensaje) values(?,?,?,?)",
+               ("Yapo", fechaInicio, fechaFin, "Exito"))
+    conn.commit()
+except Exception as e:
+    fechaFin = datetime.now()  
+    cursor.execute("insert into logs_arriendo (fuente,fechaInicio,fechaFin,mensaje) values(?,?,?,?)",
+               ("Yapo", fechaInicio, fechaFin, f"Error: {e}"))
+    conn.commit()
+    print(f"Error: {e}")
