@@ -95,14 +95,19 @@ try:
                     fecha = date.today() - timedelta(days=1)
                     dormitorios = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()
                     baños = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()
+                    comuna = datos.findAll('td')[3].find('span', class_='commune').text.strip()
+                    valor = datos.findAll('td')[2].find('span', class_='price').text.strip()
+                    dpto = dormitorios+""+baños
                     print(f"Fecha: {fecha}")
                     print(f"Url: {urlPub['href']}")
-                    print(f"Precio: {datos.findAll('td')[2].find('span', class_='price').text.strip()}")
+                    print(f"Precio: {valor}")
                     print(f"Dormitorios: {dormitorios}")
                     print(f"Baños: {baños}")
-                    print(f"Comuna: {datos.findAll('td')[3].find('span', class_='commune').text.strip()}")                                
-            except:
-                print("no data")    
+                    print(f"Comuna: {comuna}")       
+                    cursor.execute("insert into f_arriendo (url,comuna_id,valor,fecha_id,departamento_id) values(?,?,?,?,?)",
+                                (f"Url: {urlPub['href']}", comuna, valor, fecha,dpto))                         
+            except Exception as e:
+                print(f"no data: {e}")    
         pagina += 1     
     fechaFin = datetime.now()      
     cursor.execute("insert into logs_arriendo (fuente,fechaInicio,fechaFin,mensaje) values(?,?,?,?)",

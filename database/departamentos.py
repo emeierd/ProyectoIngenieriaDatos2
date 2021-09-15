@@ -98,40 +98,42 @@ while stop == False:
                 print("Finalizando scraping")
                 stop = True
                 break
-            dormitorios = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()
-            baños = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()
-            if(dormitorios == "1" and baños == "1"):
-                unouno = True
-            if(dormitorios == "2" and baños == "1"):
-                dosuno = True
-            if(dormitorios == "3" and baños == "1"):
-                tresuno = True
-            if(dormitorios == "4" and baños == "1"):
-                cuatrouno = True
-            if(dormitorios == "5" and baños == "1"):
-                cincouno = True
-            if(dormitorios == "1" and baños == "2"):
-                unodos = True        
-            if(dormitorios == "2" and baños == "2"):
-                dosdos = True   
-            if(dormitorios == "3" and baños == "2"):
-                tresdos = True   
-            if(dormitorios == "4" and baños == "2"):
-                cuatrodos = True   
-            if(dormitorios == "5" and baños == "2"):
-                cincodos = True    
-            if(dormitorios == "1" and baños == "3"):
-                unotres = True     
-            if(dormitorios == "2" and baños == "3"):
-                dostres = True     
-            if(dormitorios == "3" and baños == "3"):
-                trestres = True     
-            if(dormitorios == "4" and baños == "3"):
-                cuatrotres = True     
-            if(dormitorios == "5" and baños == "3"):
-                cincotres = True                                             
-        except:
-            print("no data")    
+            if(fecha == "Ayer"):
+                dormitorios = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()
+                baños = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()
+                if(dormitorios == "1" and baños == "1"):
+                    unouno = True
+                if(dormitorios == "2" and baños == "1"):
+                    dosuno = True
+                if(dormitorios == "3" and baños == "1"):
+                    tresuno = True
+                if(dormitorios == "4" and baños == "1"):
+                    cuatrouno = True
+                if(dormitorios == "5" and baños == "1"):
+                    cincouno = True
+                if(dormitorios == "1" and baños == "2"):
+                    unodos = True        
+                if(dormitorios == "2" and baños == "2"):
+                    dosdos = True   
+                if(dormitorios == "3" and baños == "2"):
+                    tresdos = True   
+                if(dormitorios == "4" and baños == "2"):
+                    cuatrodos = True   
+                if(dormitorios == "5" and baños == "2"):
+                    cincodos = True    
+                if(dormitorios == "1" and baños == "3"):
+                    unotres = True     
+                if(dormitorios == "2" and baños == "3"):
+                    dostres = True     
+                if(dormitorios == "3" and baños == "3"):
+                    trestres = True     
+                if(dormitorios == "4" and baños == "3"):
+                    cuatrotres = True     
+                if(dormitorios == "5" and baños == "3"):
+                    cincotres = True              
+                print(f"Dormitorios: {dormitorios}, Baños: {baños}")                               
+        except Exception as e:
+            print(f"no data: {e}")    
     pagina += 1       
 
 conn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
@@ -143,49 +145,49 @@ conn = pyodbc.connect("Driver={ODBC Driver 17 for SQL Server};"
 cursor = conn.cursor()    
 
 if unouno:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(1,1)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('11',1,1)"
     cursor.execute(query)
 if dosuno:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(2,1)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('21',2,1)"
     cursor.execute(query)
 if tresuno:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(3,1)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('31',3,1)"
     cursor.execute(query)
 if cuatrouno:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(4,1)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('41',4,1)"
     cursor.execute(query)
 if cincouno:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(5,1)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('51',5,1)"
     cursor.execute(query)
 if unodos:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(1,2)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('12',1,2)"
     cursor.execute(query)
 if dosdos:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(2,2)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('22',2,2)"
     cursor.execute(query)
 if tresdos:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(3,2)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('32',3,2)"
     cursor.execute(query)
 if cuatrodos:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(4,2)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('42',4,2)"
     cursor.execute(query)
 if cincodos:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(5,2)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('52',5,2)"
     cursor.execute(query)
 if unotres:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(1,3)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('13',1,3)"
     cursor.execute(query)
 if dostres:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(2,3)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('23',2,3)"
     cursor.execute(query)
 if trestres:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(3,3)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('33',3,3)"
     cursor.execute(query)
 if cuatrotres:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(4,3)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('43',4,3)"
     cursor.execute(query)
 if cincotres:
-    query = f"INSERT INTO d_departamento (dormitorios, baños) values(5,3)"
+    query = f"INSERT INTO d_departamento (departamento_id, dormitorios, baños) values('53',5,3)"
     cursor.execute(query)
 
 conn.commit()    
