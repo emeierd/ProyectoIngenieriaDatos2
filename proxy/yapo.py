@@ -94,20 +94,24 @@ try:
                 if(fecha == "Ayer"):
                     fecha = date.today() - timedelta(days=1)
                     dormitorios = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[0].text.strip()
+                    dormitorios = dormitorios.replace("+","")
                     baños = datos.findAll('td')[2].find('div', class_='icons').findAll('span')[1].text.strip()
+                    baños = baños.replace("+","")
                     comuna = datos.findAll('td')[3].find('span', class_='commune').text.strip()
-                    valor = datos.findAll('td')[2].find('span', class_='price').text.strip()
+                    valor = int(datos.findAll('td')[2].find('span', class_='price').text.strip().replace("$ ", "").replace(".",""))
                     dpto = dormitorios+""+baños
                     print(f"Fecha: {fecha}")
-                    print(f"Url: {urlPub['href']}")
+                    print(f"Url: {urlPub['href'].split('&xsp')[0]}")
                     print(f"Precio: {valor}")
                     print(f"Dormitorios: {dormitorios}")
                     print(f"Baños: {baños}")
                     print(f"Comuna: {comuna}")       
-                    cursor.execute("insert into f_arriendo (url,comuna_id,valor,fecha_id,departamento_id) values(?,?,?,?,?)",
-                                (f"Url: {urlPub['href']}", comuna, valor, fecha,dpto))                         
+                    if(valor >100000):
+                        cursor.execute("insert into f_arriendo (url,comuna_id,valor,fecha_id,departamento_id) values(?,?,?,?,?)",
+                                    (urlPub['href'].split("&xsp")[0], comuna, valor, fecha,dpto))                         
             except Exception as e:
                 print(f"no data: {e}")    
+        conn.commit()       
         pagina += 1     
     fechaFin = datetime.now()      
     cursor.execute("insert into logs_arriendo (fuente,fechaInicio,fechaFin,mensaje) values(?,?,?,?)",
